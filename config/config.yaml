@@ -1,0 +1,122 @@
+# Configuration file for the financial modeling system
+
+# API Keys
+api_keys:
+  exa: "your-exa-api-key-here"
+  bettafish: "your-bettafish-api-key-here"
+  alpha_vantage: "your-alpha-vantage-api-key-here"
+
+# Architecture Configuration
+architecture:
+  backend:
+    type: "java"  # java for data ingestion and storage
+    redis:
+      host: "localhost"
+      port: 6379
+      ttl_weeks: 2  # 2-week retention
+    api:
+      host: "localhost"
+      port: 8080
+  
+  models:
+    type: "rust"  # rust for Random Forest and Gaussian Copula
+    random_forest:
+      n_trees: 100
+      max_depth: 20
+      min_samples_split: 5
+    gaussian_copula:
+      n_simulations: 10000
+
+# Data sources
+data:
+  # Assets to track
+  assets:
+    - "NQ"
+    - "NVDA"
+    - "AMD"
+    - "WDC"
+    - "SLV"
+    - "GS"
+    - "NET"
+    - "EWJ"
+    - "EURUSD"
+    - "INRJPY"
+    - "BRLGBP"
+
+  # Historical data parameters
+  history:
+    period: "2y"  # Period for historical data
+    interval: "1d"  # Data interval
+
+  # Data source
+  source: "java"  # java backend with Redis
+
+# Gaussian Copula parameters
+copula:
+  method: "pearson"  # Correlation method: pearson, kendall, spearman
+  n_samples: 10000  # Number of samples to generate
+  random_state: 42
+
+# Random Forest parameters
+random_forest:
+  n_estimators: 100
+  max_depth: 10
+  min_samples_split: 5
+  min_samples_leaf: 2
+  max_features: "sqrt"
+  random_state: 42
+
+# Model training
+training:
+  test_size: 0.2
+  validation_size: 0.1
+  cross_validation_folds: 5
+
+  # Feature engineering
+  lookback_periods: [5, 10, 20]  # Days for moving averages
+  use_returns: true
+  use_volatility: true
+  use_sentiment: true
+  use_news: true
+
+# Sentiment analysis
+sentiment:
+  bettafish:
+    enabled: true
+    max_posts: 100  # Maximum posts to analyze per asset
+    sources: ["twitter", "reddit", "news"]
+
+  # Sentiment feature windows
+  windows: [1, 3, 7]  # Days
+
+# News analysis
+news:
+  exa:
+    enabled: true
+    max_results: 20  # Maximum news articles per asset
+    recency: "7d"  # How far back to search
+
+  # Text processing
+  text_features:
+    - sentiment
+    - relevance
+    - urgency
+
+# Model inference
+inference:
+  prediction_horizon: 1  # Days ahead to predict
+  confidence_interval: 0.95
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "json"  # json or text
+  file: "logs/app.log"
+  rotation: "10 MB"
+
+# Paths
+paths:
+  data_dir: "data"
+  model_dir: "models"
+  log_dir: "logs"
+  cache_dir: "cache"

@@ -1,0 +1,11 @@
+/home/printer/Desktop/bot/sugi1/rust-model/target/release/deps/approx-2971c2ce82e94583.d: /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/lib.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/abs_diff_eq.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/relative_eq.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/ulps_eq.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/macros.rs
+
+/home/printer/Desktop/bot/sugi1/rust-model/target/release/deps/libapprox-2971c2ce82e94583.rlib: /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/lib.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/abs_diff_eq.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/relative_eq.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/ulps_eq.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/macros.rs
+
+/home/printer/Desktop/bot/sugi1/rust-model/target/release/deps/libapprox-2971c2ce82e94583.rmeta: /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/lib.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/abs_diff_eq.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/relative_eq.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/ulps_eq.rs /home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/macros.rs
+
+/home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/lib.rs:
+/home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/abs_diff_eq.rs:
+/home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/relative_eq.rs:
+/home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/ulps_eq.rs:
+/home/printer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/approx-0.5.1/src/macros.rs:

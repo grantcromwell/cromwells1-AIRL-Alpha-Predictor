@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #e9ecef;
+        }
+        
+        .positive {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .negative {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Financial Analysis Dashboard</h1>
+        
+        <button class="refresh-btn" onclick="fetchData()">Refresh Data</button>
+        <div class="loading" id="loading">Loading data...</div>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>Strongest Movers (Alpha Search)</h2>
+                <table id="strongest-movers-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Alpha</th>
+                            <th>Probability</th>
+                            <th>Change</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <h2>Highest Volume</h2>
+                <table id="highest-volume-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Volume</th>
+                            <th>Alpha</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <h2>Highest Probable Alpha</h2>
+                <table id="probable-alpha-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Alpha</th>
+                            <th>Probability</th>
+                            <th>Change</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Alpha Distribution</h2>
+            <div class="chart-container">
+                <canvas id="alphaChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Volume Distribution</h2>
+            <div class="chart-container">
+                <canvas id="volumeChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Symbols</div>
+                <div class="stat-value" id="total-symbols">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Alpha</div>
+                <div class="stat-value" id="avg-alpha">0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Volume</div>
+                <div class="stat-value" id="total-volume">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let alphaChart, volumeChart;
+        
+        async function fetchData() {
+            document.getElementById('loading').classList.add('active');
+            
+            try {
+                const response = await fetch('/api/equity/all');
+                const data = await response.json();
+                
+                const analysis = analyzeData(data);
+                updateUI(analysis);
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                alert('Error fetching data. Please ensure the backend is running.');
+            }
+            
+            document.getElementById('loading').classList.remove('active');
+        }
+        
+        function analyzeData(data) {
+            const symbolData = {};
+            
+            data.forEach(item => {
+                if (!symbolData[item.symbol]) {
+                    symbolData[item.symbol] = [];
+                }
+                symbolData[item.symbol].push(item);
+            });
+            
+            const strongestMovers = calculateAlpha(symbolData);
+            const highestVolume = calculateVolume(symbolData);
+            const probableAlpha = calculateProbableAlpha(symbolData);
+            
+            return {
+                strongestMovers,
+                highestVolume,
+                probableAlpha,
+                symbolData
+            };
+        }
+        
+        function calculateAlpha(symbolData) {
+            const results = [];
+            
+            for (const [symbol, items] of Object.entries(symbolData)) {
+                if (items.length < 30) continue;
+                
+                const window = items.slice(-30);
+                const alpha = calculateSharpe(window);
+                const change = ((window[window.length - 1].close - window[0].close) / window[0].close) * 100;
+                const probability = Math.min(Math.abs(alpha) / 5, 1);
+                
+                results.push({
+                    symbol,
+                    alpha: alpha.toFixed(4),
+                    probability: probability.toFixed(2),
+                    change: change.toFixed(2)
+                });
+            }
+            
+            return results.sort((a, b) => Math.abs(b.alpha) - Math.abs(a.alpha)).slice(0, 5);
+        }
+        
+        function calculateSharpe(window) {
+            const returns = [];
+            for (let i = 1; i < window.length; i++) {
+                returns.push((window[i].close - window[i - 1].close) / window[i - 1].close);
+            }
+            
+            const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+            const variance = returns.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / returns.length;
+            const std = Math.sqrt(variance);
+            
+            return std !== 0 ? (mean / std) * Math.sqrt(returns.length) : 0;
+        }
+        
+        function calculateVolume(symbolData) {
+            const results = [];
+            
+            for (const [symbol, items] of Object.entries(symbolData)) {
+                if (items.length === 0) continue;
+                
+                const window = items.slice(-30);
+                const avgVolume = window.reduce((sum, item) => sum + item.volume, 0) / window.length;
+                const alpha = calculateSharpe(window);
+                
+                results.push({
+                    symbol,
+                    volume: avgVolume.toFixed(0),
+                    alpha: alpha.toFixed(4)
+                });
+            }
+            
+            return results.sort((a, b) => b.volume - a.volume).slice(0, 5);
+        }
+        
+        function calculateProbableAlpha(symbolData) {
+            const results = [];
+            
+            for (const [symbol, items] of Object.entries(symbolData)) {
+                if (items.length < 30) continue;
+                
+                const window = items.slice(-30);
+                const alpha = calculateSharpe(window);
+                const probability = Math.min(Math.abs(alpha) / 5, 1);
+                const change = ((window[window.length - 1].close - window[0].close) / window[0].close) * 100;
+                
+                if (probability > 0.5) {
+                    results.push({
+                        symbol,
+                        alpha: alpha.toFixed(4),
+                        probability: probability.toFixed(2),
+                        change: change.toFixed(2)
+                    });
+                }
+            }
+            
+            return results.sort((a, b) => b.alpha - a.alpha).slice(0, 5);
+        }
+        
+        function updateUI(analysis) {
+            updateTable('strongest-movers-table', analysis.strongestMovers);
+            updateTable('highest-volume-table', analysis.highestVolume);
+            updateTable('probable-alpha-table', analysis.probableAlpha);
+            
+            updateCharts(analysis);
+            updateStats(analysis);
+        }
+        
+        function updateTable(tableId, data) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = '';
+            
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                if (row.change) {
+                    const changeClass = parseFloat(row.change) >= 0 ? 'positive' : 'negative';
+                    tr.innerHTML = `
+                        <td>${row.symbol}</td>
+                        <td class="${parseFloat(row.alpha) >= 0 ? 'positive' : 'negative'}">${row.alpha}</td>
+                        <td>${(parseFloat(row.probability) * 100).toFixed(0)}%</td>
+                        <td class="${changeClass}">${parseFloat(row.change) >= 0 ? '+' : ''}${row.change}%</td>
+                    `;
+                } else {
+                    tr.innerHTML = `
+                        <td>${row.symbol}</td>
+                        <td>${Number(row.volume).toLocaleString()}</td>
+                        <td class="${parseFloat(row.alpha) >= 0 ? 'positive' : 'negative'}">${row.alpha}</td>
+                    `;
+                }
+                
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function updateCharts(analysis) {
+            const symbols = Object.keys(analysis.symbolData);
+            const alphas = symbols.map(s => {
+                const items = analysis.symbolData[s];
+                const window = items.slice(-30);
+                return calculateSharpe(window);
+            });
+            
+            const volumes = symbols.map(s => {
+                const items = analysis.symbolData[s];
+                const window = items.slice(-30);
+                return window.reduce((sum, item) => sum + item.volume, 0) / window.length;
+            });
+            
+            if (alphaChart) alphaChart.destroy();
+            if (volumeChart) volumeChart.destroy();
+            
+            alphaChart = new Chart(document.getElementById('alphaChart'), {
+                type: 'bar',
+                data: {
+                    labels: symbols,
+                    datasets: [{
+                        label: 'Alpha',
+                        data: alphas,
+                        backgroundColor: alphas.map(a => a >= 0 ? 'rgba(40, 167, 69, 0.6)' : 'rgba(220, 53, 69, 0.6)'),
+                        borderColor: alphas.map(a => a >= 0 ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+            
+            volumeChart = new Chart(document.getElementById('volumeChart'), {
+                type: 'bar',
+                data: {
+                    labels: symbols,
+                    datasets: [{
+                        label: 'Volume',
+                        data: volumes,
+                        backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+        
+        function updateStats(analysis) {
+            const symbols = Object.keys(analysis.symbolData);
+            const alphas = symbols.map(s => {
+                const items = analysis.symbolData[s];
+                const window = items.slice(-30);
+                return calculateSharpe(window);
+            });
+            
+            const avgAlpha = alphas.reduce((a, b) => a + b, 0) / alphas.length;
+            const totalVolume = symbols.reduce((sum, s) => {
+                const items = analysis.symbolData[s];
+                return sum + items.reduce((s2, item) => s2 + item.volume, 0);
+            }, 0);
+            
+            document.getElementById('total-symbols').textContent = symbols.length;
+            document.getElementById('avg-alpha').textContent = avgAlpha.toFixed(4);
+            document.getElementById('total-volume').textContent = (totalVolume / 1000000).toFixed(2) + 'M';
+        }
+        
+        fetchData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: financial-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./logs:/logs
+    command: redis-server --appendonly yes --loglevel notice --logfile /logs/redis.log
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  java-backend:
+    build:
+      context: ./java-backend
+      dockerfile: Dockerfile
+    container_name: financial-java-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  rust-models:
+    build:
+      context: ./rust-model
+      dockerfile: Dockerfile
+    container_name: financial-rust-models
+    depends_on:
+      - java-backend
+    volumes:
+      - ./logs:/app/logs
+    environment:
+      - JAVA_API_URL=http://java-backend:8080
+    restart: unless-stopped
+
+  ui:
+    image: nginx:alpine
+    container_name: financial-ui
+    ports:
+      - "8081:80"
+    depends_on:
+      - java-backend
+    volumes:
+      - ./src/ui:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: financial-network
