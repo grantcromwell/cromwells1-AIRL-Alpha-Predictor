@@ -4,7 +4,8 @@ This is Season 1 of a pleathrea of quantitive open source models that haven been
 
 
 ---
-               FED RATE CUT PREDICTION - ENSEMBLE MODEL
+               FED RATE CUT PREDICTION - ENSEMBLE MODEL 
+               LAST UPDATED: Jan 17 2026
 ---
 
  Rate Cut Probability: 56.4%
