@@ -1,7 +1,26 @@
 **README: Financial Forecasting System - Cromwells1 v2.1**
 
+This is Season 1 of a pleathrea of quantitive open source models that haven been proved to yield results.
+
+
+======================================================================
+               FED RATE CUT PREDICTION - ENSEMBLE MODEL
+======================================================================
+
+ Rate Cut Probability: 56.4%
+ Decision: UNCERTAIN (UNCERTAIN)
+ Regime: PROACTIVE (Proactive: 72.0%, Reactive: 28.0%)
+Model: Regime-Switching Ensemble with Hybrid Threshold Strategy
+
+Next FOMC Meeting:
+  Date: January 28, 2026
+  Days until meeting: 10
+
+
+
+
 **Version:** 3.2  
-**Last Updated:** December 2025
+**Report Updated:** December 2025
 
 **1. Introduction**
 
